@@ -1,6 +1,6 @@
 import React from "react";
 
-const Country = ({ country, handleClick }) => {
+const WeatherCard = ({ country, handleClick }) => {
   return (
     <>
       <p>
@@ -11,4 +11,4 @@ const Country = ({ country, handleClick }) => {
   );
 };
  
-export default Country;
+export default WeatherCard;

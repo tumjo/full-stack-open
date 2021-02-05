@@ -1,4 +1,5 @@
 import React from "react";
+import WeatherCard from "./WeatherCard";
 
 const CountryCard = ({ country }) => {
   //console.log(country);
@@ -6,7 +7,7 @@ const CountryCard = ({ country }) => {
     <div>
       <h2>{country.name}</h2>
       <p>Capital: {country.capital}</p>
-      <p>population: {country.population}</p>
+      <p>Population: {country.population}</p>
       <h4>Languages</h4>
       <ul>
         {country.languages.map((language) => {
@@ -15,10 +16,11 @@ const CountryCard = ({ country }) => {
       </ul>
       <img
         src={country.flag}
-        alt="Girl in a jacket"
+        alt="Flag"
         height="200"
         width="326"
       ></img>
+      <WeatherCard city={country.capital} />
     </div>
   );
 };

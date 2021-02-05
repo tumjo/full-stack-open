@@ -17,6 +17,8 @@ const Countries = ({ filter, countries, handleClick }) => {
     );
   } else if (countries.length === 1) {
     return <CountryCard country={countries[0]} />;
+  } else if (countries.length < 1) {
+    return <p>No results</p>;
   } else {
     return <p>Too many matches, spesify another filter</p>;
   }
