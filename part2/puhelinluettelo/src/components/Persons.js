@@ -5,7 +5,13 @@ const Persons = (props) => {
   return (
     <div>
       {props.persons.map((person) => {
-        return <Person key={person.name} person={person} />;
+        return (
+          <Person
+            key={person.name}
+            person={person}
+            removePerson={props.removePerson}
+          />
+        );
       })}
     </div>
   );

@@ -1,9 +1,9 @@
 import "./App.css";
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
 import FilterForm from "./components/FilterForm";
+import personService from "./services/persons";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -11,14 +11,15 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [newFilter, setNewFilter] = useState("");
 
+  console.log(persons);
+
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then((response) => {
-      //console.log("promise fulfilled", response);
-      setPersons(response.data);
+    personService.getAll().then((responseData) => {
+      setPersons(responseData);
     });
   }, []);
 
-  console.log(`persons.length: ${persons.length}`)
+  //console.log(`persons.length: ${persons.length}`);
 
   const addPerson = (event) => {
     event.preventDefault();
@@ -28,11 +29,31 @@ const App = () => {
     };
 
     if (!persons.some((person) => person.name === newName)) {
-      setPersons(persons.concat(nameObject));
-      setNewName("");
-      setNewNumber("");
+      personService.create(nameObject).then((responseData) => {
+        setPersons(persons.concat(responseData));
+        setNewName("");
+        setNewNumber("");
+      });
     } else {
       alert(`${newName} is already added to phonebook`);
+    }
+  };
+
+  const removePerson = (person) => {
+    const id = person.id;
+    if (window.confirm(`Delete ${person.name}?`)) {
+      const filteredPersons = persons.filter((person) => {
+        return person.id !== id;
+      });
+      personService
+        .remove(id)
+        .then(() => {
+          setPersons(filteredPersons);
+        })
+        .catch((error) => {
+          alert(`the person was already deleted from server. ${error}`);
+          setPersons(filteredPersons);
+        });
     }
   };
 
@@ -71,7 +92,7 @@ const App = () => {
         handleNumberChange={handleNumberChange}
       />
       <h2>Numbers</h2>
-      <Persons persons={personsToShow} />
+      <Persons persons={personsToShow} removePerson={removePerson} />
     </div>
   );
 };
