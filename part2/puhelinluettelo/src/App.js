@@ -11,7 +11,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [newFilter, setNewFilter] = useState("");
 
-  console.log(persons);
+  //console.log(persons);
 
   useEffect(() => {
     personService.getAll().then((responseData) => {
@@ -19,23 +19,47 @@ const App = () => {
     });
   }, []);
 
-  //console.log(`persons.length: ${persons.length}`);
-
   const addPerson = (event) => {
     event.preventDefault();
     const nameObject = {
       name: newName,
       number: newNumber,
     };
-
-    if (!persons.some((person) => person.name === newName)) {
+    if (persons.some((person) => person.name === newName)) {
+      if (
+        window.confirm(
+          `${newName} is already added to phonebook, replace the old number with anew one?`
+        )
+      ) {
+        const findPerson = persons.find((person) => person.name === newName);
+        const changedPerson = { ...findPerson, number: nameObject.number };
+        personService
+          .update(changedPerson.id, changedPerson)
+          .then((responseData) => {
+            setPersons(
+              persons.map((person) =>
+                person.id !== changedPerson.id ? person : responseData
+              )
+            );
+            setNewName("");
+            setNewNumber("");
+          })
+          .catch((error) => {
+            alert(
+              `the person '${changedPerson.name}' was already deleted from server. ${error}`
+            );
+            const filteredPersons = persons.filter((person) => {
+              return person.id !== changedPerson.id;
+            });
+            setPersons(filteredPersons);
+          });
+      }
+    } else {
       personService.create(nameObject).then((responseData) => {
         setPersons(persons.concat(responseData));
         setNewName("");
         setNewNumber("");
       });
-    } else {
-      alert(`${newName} is already added to phonebook`);
     }
   };
 
@@ -51,7 +75,9 @@ const App = () => {
           setPersons(filteredPersons);
         })
         .catch((error) => {
-          alert(`the person was already deleted from server. ${error}`);
+          alert(
+            `the person '${person.name}' was already deleted from server. ${error}`
+          );
           setPersons(filteredPersons);
         });
     }
